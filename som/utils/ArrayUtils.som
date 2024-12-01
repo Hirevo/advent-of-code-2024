@@ -1,0 +1,97 @@
+" some convenience methods for working with arrays "
+ArrayUtils = (
+    ---------
+
+    reverse: array = (
+        1 to: array length / 2 do: [ :idx |
+            | temp |
+            temp := array at: idx.
+            array at: idx put: (array at: array length + 1 - idx).
+            array at: array length + 1 - idx put: temp.
+        ].
+    )
+
+    equals: fst with: snd = (
+        fst length = snd length ifFalse: [ ^ false ].
+        1 to: fst length do: [ :idx |
+            (fst at: idx) = (snd at: idx) ifFalse: [ ^ false ].
+        ].
+        ^ true.
+    )
+
+    any: blk in: array = (
+        1 to: array length do: [ :idx |
+            (blk value: (array at: idx) with: idx) ifTrue: [ ^ true ].
+        ].
+
+        ^ false.
+    )
+
+    all: blk in: array = (
+        1 to: array length do: [ :idx |
+            (blk value: (array at: idx) with: idx) ifFalse: [ ^ false ].
+        ].
+
+        ^ true.
+    )
+
+    find: blk in: array = (
+        1 to: array length do: [ :idx |
+            (blk value: (array at: idx) with: idx) ifTrue: [ ^ array at: idx ].
+        ].
+
+        ^ nil.
+    )
+
+    findIndex: blk in: array = (
+        1 to: array length do: [ :idx |
+            (blk value: (array at: idx) with: idx) ifTrue: [ ^ idx ].
+        ].
+
+        ^ nil.
+    )
+
+    findMap: blk in: array = (
+        1 to: array length do: [ :idx |
+            idx := blk value: (array at: idx) with: idx.
+            idx ifNotNil: [ ^ idx ].
+        ].
+
+        ^ nil.
+    )
+
+    findLast: blk in: array = (
+        array length downTo: 1 do: [ :idx |
+            (blk value: (array at: idx) with: idx) ifTrue: [ ^ array at: idx ].
+        ].
+
+        ^ nil.
+    )
+
+    findLastIndex: blk in: array = (
+        array length downTo: 1 do: [ :idx |
+            (blk value: (array at: idx) with: idx) ifTrue: [ ^ idx ].
+        ].
+
+        ^ nil.
+    )
+
+    findLastMap: blk in: array = (
+        array length downTo: 1 do: [ :idx |
+            idx := blk value: (array at: idx) with: idx.
+            idx ifNotNil: [ ^ idx ].
+        ].
+
+        ^ nil.
+    )
+
+    count: blk in: array = (
+        | count |
+        count := 0.
+        1 to: array length do: [ :idx |
+            (blk value: (array at: idx) with: idx) ifTrue: [ count := count + 1 ].
+        ].
+
+        ^ count.
+    )
+)
