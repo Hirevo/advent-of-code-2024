@@ -1,0 +1,106 @@
+Day02 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day02.txt'.
+        input ifNil: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        input := input collect: [ :line |
+            line := line split: ' '.
+            line collect: [ :number | Integer fromString: number ].
+        ].
+    )
+
+    checkWindows: block over: array = (
+        2 to: array length do: [ :idx |
+            (block value: (array at: idx) with: (array at: idx - 1)) ifFalse: [ ^ false ].
+        ].
+        ^ true.
+    )
+
+    isSafe: levels = (
+        ^ (
+            (self checkWindows: [ :n1 :n2 | n1 > n2 ] over: levels)
+                or: (self checkWindows: [ :n1 :n2 | n1 < n2 ] over: levels)
+        ) and: (
+            self checkWindows: [ :n1 :n2 | (n1 - n2) abs between: 0 and: 4 ] over: levels
+        ).
+    )
+
+    checkWindows: block over: array ignoring: index = (
+        | idx1 idx2 |
+
+        idx1 := 1.
+        idx2 := 2.
+
+        idx1 = index ifTrue: [
+            idx1 := idx1 + 1.
+            idx2 := idx2 + 1.
+        ].
+        idx2 = index ifTrue: [ idx2 := idx2 + 1 ].
+
+        [ idx2 > array length ] whileFalse: [
+            (block value: (array at: idx1) with: (array at: idx2)) ifFalse: [ ^ false ].
+            idx1 := idx1 + 1.
+            idx2 := idx2 + 1.
+            idx1 = index ifTrue: [ idx1 := idx1 + 1 ].
+            idx2 = index ifTrue: [ idx2 := idx2 + 1 ].
+        ].
+
+        ^ true.
+    )
+
+
+    isSafe: levels ignoring: index = (
+        ^ (
+            (self checkWindows: [ :n1 :n2 | n1 > n2 ] over: levels ignoring: index)
+                or: (self checkWindows: [ :n1 :n2 | n1 < n2 ] over: levels ignoring: index)
+        ) and: (
+            self checkWindows: [ :n1 :n2 | (n1 - n2) abs between: 0 and: 4 ] over: levels ignoring: index
+        ).
+    )
+
+    isSafeWithTolerance: levels = (
+        (self isSafe: levels) ifTrue: [ ^ true ].
+
+        1 to: levels length do: [ :idx |
+            (self isSafe: levels ignoring: idx) ifTrue: [ ^ true ].
+        ].
+
+        ^ false.
+    )
+
+    part1 = (
+        | answer |
+
+        answer := input inject: 0 into: [ :acc :levels |
+            acc + (
+                (self isSafe: levels) ifTrue: 1 ifFalse: 0
+            ).
+        ].
+
+        ('part1: ' + answer) println.
+    )
+
+    part2 = (
+        | answer |
+
+        answer := input inject: 0 into: [ :acc :levels |
+            acc + (
+                (self isSafeWithTolerance: levels) ifTrue: 1 ifFalse: 0
+            ).
+        ].
+
+        ('part2: ' + answer) println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
