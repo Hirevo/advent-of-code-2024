@@ -1,0 +1,73 @@
+Day01 = (
+    | list1 list2 |
+
+    setup = (
+        | input |
+
+        input := system loadFile: 'inputs/day01.txt'.
+        input ifNil: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        list1 := Array new: input length.
+        list2 := Array new: input length.
+
+        1 to: input length do: [ :idx |
+            | line |
+            line := input at: idx.
+            line := line split: '   '.
+            list1 at: idx put: (Integer fromString: (line at: 1)).
+            list2 at: idx put: (Integer fromString: (line at: 2)).
+        ].
+    )
+
+    part1 = (
+        | sorted1 sorted2 answer |
+
+        sorted1 := list1 copy.
+        sorted2 := list2 copy.
+
+        Sorter quicksort: sorted1.
+        Sorter quicksort: sorted2.
+
+        answer := 0.
+
+        1 to: sorted1 length do: [ :idx |
+            answer := answer + (
+                (sorted1 at: idx) - (sorted2 at: idx)
+            ) abs.
+        ].
+
+        ('part1: ' + answer) println.
+    )
+
+    part2 = (
+        | map answer |
+
+        map := MyHashMap new.
+
+        list2 do: [ :number |
+            | entry |
+            entry := map entry: number.
+            entry value ifNil: [ entry value: 1 ] ifNotNil: [ entry value: entry value + 1 ].
+        ].
+
+        answer := 0.
+
+        list1 do: [ :number |
+            | count |
+            count := map at: number.
+            count ifNotNil: [ answer := answer + (number * count) ].
+        ].
+
+        ('part2: ' + answer) println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
